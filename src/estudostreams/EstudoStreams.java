@@ -1,7 +1,11 @@
 package estudostreams;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EstudoStreams {
 
@@ -36,6 +40,7 @@ public class EstudoStreams {
                .forEach(e->System.out.println(e)); //O método forEach funciona como um for each;    
          */
 
+ /*
         //Streams parte 1 - operações intermediárias
         List<Integer> lista = Arrays.asList(1, 5, 8, 9, 1, 4, 7, 6, 6, 9, 9);
 
@@ -44,7 +49,7 @@ public class EstudoStreams {
                 .forEach(e -> System.out.println(e));
 
         //skip é uma operação intermediária.
-        //operações intermediárias são chamadas assim porque é possível realizá-las diversas vezes antes de realizar uma operação final (inclusive uma já realizada).
+        //operações intermediárias são chamadas assim porque é possível realizá-las diversas vezes antes de realizar uma operação terminal (inclusive uma já realizada).
         System.out.println("\n==================================\n");
 
         //Agora outros exemplos de operações intermediárias:
@@ -67,7 +72,7 @@ public class EstudoStreams {
                 .forEach(e -> System.out.println(e));
 
         System.out.println("\n==================================\n");
-
+        
         lista.stream()
                 .filter(e -> e % 2 == 0) //O método filter(Predicate) permite que implementemos o filtro que quisermos.
                 .forEach(e -> System.out.println(e));
@@ -79,5 +84,72 @@ public class EstudoStreams {
                 .forEach(e -> System.out.println(e));
         
         //O ideal é utilizar as operções de filtragem antes das interativas.
+         */
+        //Streams parte 2 - operações terminais.
+        //forEach(Consumer) é uma operação terminal.
+        //Operações terminais só podem ser usada uma vez no fluxo de uma stream e encerram ela.
+        List<Integer> lista = Arrays.asList(1, 5, 8, 9, 1, 4, 7, 6, 6, 9, 9);
+
+        long count = lista.stream()
+                .distinct()
+                .filter(e -> e % 2 == 0)
+                .count(); //O método count() é uma operação terminal que retona a quantia de elementos nessa stream.
+        System.out.println(count);
+        
+        System.out.println("\n==================================\n");
+        
+        Optional<Integer> min = lista.stream()
+                .distinct()
+                .filter(e -> e % 2 == 0)
+                .min(Comparator.naturalOrder()); //O método min(Comparator) é uma operação terminal que retona o "menor" elemento nessa stream baseado na comparação que você deu.
+                //aqui está se usando uma comparação nativa do Java, mas para elementos autorais se deve extender comparable na classe que cria os elementos e implementar um compareTo() ou criar aqui uma função de comparação dos elementos.
+        System.out.println(min.get());
+        
+        System.out.println("\n==================================\n");
+        
+        Optional<Integer> max = lista.stream()
+                .distinct()
+                .filter(e -> e % 2 == 0)
+                .max(Comparator.naturalOrder()); //O método max(Comparator) é o oposto do min(Comparator).
+        System.out.println(max.get());
+        
+        System.out.println("\n==================================\n");
+        
+        //O método collect é uma operação terminal com várias versões que tem como objetivo agrupar as manipulações feitas em uma stream.
+        
+        List<Integer> novaLista = lista.stream()
+                .distinct()
+                .filter(e -> e % 2 == 0)
+                .collect(Collectors.toList()); //O método collect(Collectors.toList()) é uma operação terminal que agrupa e retorna o resultado das manipulações feitas na stream em uma lista.
+        System.out.println(novaLista);
+        
+        System.out.println("\n==================================\n");
+        
+       Map<Boolean,  List<Integer>> mapa = lista.stream()
+                .map(e -> e * 3)
+                .collect(Collectors.groupingBy(e -> e % 2 == 0)); //O método collect(Collectors.groupingBy(Function)) é uma operação terminal que agrupa e retorna o resultado das manipulações feitas na stream em um map com a organização dele sendo definida pela função passada no groupingBy.
+        System.out.println(mapa);
+        
+        System.out.println("\n==================================\n");
+        
+        Map<Integer,  List<Integer>> mapa2 = lista.stream()
+                .collect(Collectors.groupingBy(e -> e % 3)); 
+        System.out.println(mapa2);
+        //aqui o mapa é de inteiros, pois o resultado da função é um inteiro.
+        System.out.println("\n==================================\n");
+        
+        String joining = lista.stream()
+                .map(e -> String.valueOf(e))
+                .collect(Collectors.joining()); //O método collect(Collectors.joining) é uma operação terminal que agrupa e retorna o resultado das manipulações feitas na stream em uma String concatenada.
+        System.out.println(joining);
+        
+        System.out.println("\n==================================\n");
+        
+        String joining2 = lista.stream()
+                .map(e -> String.valueOf(e))
+                .collect(Collectors.joining(";")); 
+        System.out.println(joining2);
+        //também é possível fazer com que o joining contate algo entre os elementos ao adicionar um delimitador (há também uma terceira assinatura mais detalhada).
+        System.out.println("\n==================================\n");
     }
 }
