@@ -85,6 +85,7 @@ public class EstudoStreams {
         
         //O ideal é utilizar as operções de filtragem antes das interativas.
          */
+ /*
         //Streams parte 2 - operações terminais.
         //forEach(Consumer) é uma operação terminal.
         //Operações terminais só podem ser usada uma vez no fluxo de uma stream e encerram ela.
@@ -151,5 +152,66 @@ public class EstudoStreams {
         System.out.println(joining2);
         //também é possível fazer com que o joining contate algo entre os elementos ao adicionar um delimitador (há também uma terceira assinatura mais detalhada).
         System.out.println("\n==================================\n");
+         */
+        //Optional
+        //Classe inserida no Java 8 que tem por intuito facilitar o trabalho com valores que podem ser null.
+        //Existem Optionals para os tipos primitivos.
+        //Optinal foi criado para ser utilizado como retorno de método que pode retornar nulo, não como argumento recebido.
+        
+        String s = "1";
+        Optional<Integer> numero = converteEmNumero(s);//Esse optinal, por exemplo, é um obj que pode ou não conter um inteiro
+        System.out.println(numero);
+        
+        String s2 = "a";
+        Optional<Integer> numero2 = converteEmNumero(s2);
+        System.out.println(numero2);
+        
+        System.out.println("\n==================================\n");
+        
+        //Usando os Optinals
+        System.out.println(numero.isPresent());//O métodod isPresent() retorna verdadeiro caso o Optinal esteja preenchido
+        System.out.println(numero2.isPresent());//e false caso o Optinal esteja vazio.
+        
+        System.out.println("\n==================================\n");
+        
+        System.out.println(numero.get());//O método get() retorna o valor presente dentro do Optional ou uma excessão caso ele esteja vazio.
+        
+        System.out.println("\n==================================\n");
+        
+        numero.ifPresent(n -> System.out.println(n));//O método ifPresent(Consumer) excuta a expressão Lambda dentro dele apenas se o Optinal estiver preenchido.
+        numero2.ifPresent(n -> System.out.println(n)); 
+        
+        System.out.println("\n==================================\n");
+        
+        Integer numero3 = converteEmNumero(s).orElse(0);//O método orElse(T other) dispara caso o retorno do método ao qual ele está ligado seja um Optinal vazio, assim ele insere o valor presente nele no lugar do Optional vazio.
+        System.out.println(numero3);
+        Integer numero4 = converteEmNumero(s2).orElse(0);
+        System.out.println(numero4);
+        
+        System.out.println("\n==================================\n");
+        
+        Integer numero5 = converteEmNumero(s).orElseGet(() -> -1);//O método orElseGet(Supplier) dispara caso o retorno do método ao qual ele está ligado seja um Optinal vazio, assim ele excuta a expressão Lambda dentro dele.
+        System.out.println(numero5);
+        Integer numero6 = converteEmNumero(s2).orElseGet(() -> -1);
+        System.out.println(numero6);
+        //Há um ifPresentOrElse(Consumer, Runnable) que é como uma mistura do ifPresent com o orElseGet, ele performa a primeira expressão Lambda caso o Optional esteja preenchido e a segunda caso não.
+        
+        System.out.println("\n==================================\n");
+        
+        Integer numero7 = converteEmNumero(s).orElseThrow(() -> new NullPointerException("Valor vazio."));//O método orElseThrow(Supplier) dispara caso o retorno do método ao qual ele está ligado seja um Optinal vazio, assim ele lança uma excessão excutando a expressão Lambda dentro dele.
+        System.out.println(numero7);
+        Integer numero8 = converteEmNumero(s2).orElseThrow(() -> new NullPointerException("Valor vazio."));
+        System.out.println(numero8);
+    }
+
+    //Optional
+    public static Optional<Integer> converteEmNumero(String s) {
+        try {
+            Integer inteiro = Integer.valueOf(s);
+            return Optional.of(inteiro);//O método of(valor) retorna um Optional de um valor não-nulo.
+            //Há um método para Optinal chamado ofNullable(valor), usado para converter valores que tem a possibilidade de serem nulos, se for nulo retorna um Optional vazio.
+        }catch(Exception e){
+            return Optional.empty();//O método empty() retorna um Optional vazio.
+        }
     }
 }
