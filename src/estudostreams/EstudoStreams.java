@@ -1,5 +1,6 @@
 package estudostreams;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -33,6 +34,9 @@ public class EstudoStreams {
        
        //Versão Lambda
        new Thread(() -> System.out.println("Olá mundo!")).run();
+        
+       //Obs.: Em expressões Lambda é necessário o uso de parenteses no parametro quando: Não há parametros, há mais de um parametro ou quiser definir o tipo do parametro (se houver mais de um deve tipar todos).
+       //Obs. 2: Em expressões Lambda é necessário o uso de chaves apenas quando há mais de uma linha, mas quando se põe elas é necessário colocar return, em expressões que retornam algo, e finalizar as linhas com ;. 
        
        //É possível usar expressões Lambdas tanto de interfaces SAM já presentes no Java quanto daquelas criadas por você.
        //O principal motivo para a implementação das funções Lambda no Java foi para possibilitar o uso das Streams.
@@ -295,6 +299,7 @@ public class EstudoStreams {
          //Esse modelo de reduce existe especificamente para casos como esse, pois pode haver um ganho de performace, pois nos outros casos a função de acumulação e combinação são a mesma, então as opções anteriores de reduce já bastam.
          */
          
+        /*
         //Streams - Collect
         //Semelhante ao reduce, porém para trabalhar com objetos mutáveis.
         
@@ -382,6 +387,47 @@ public class EstudoStreams {
         Map<Integer, Double> collectToMap = list.stream()
                 .collect(Collectors.toMap(e -> e, e -> Math.pow(e.doubleValue(), 5)));//O método collect(Collectors.toMap(Function, Function)) agrupa e retorna o resultado das manipulações feitas na stream em um map com a chave sendo definida pela primeira função e o valor pela segunda, há mais assituras de toMap essa é a mais simples, mas o toMap é só uma opção mais personalizavel para retorna um map de uma stream.
         System.out.println(collectToMap);
+        */
+        
+        //Method Reference
+        //Uma maneira de encurtar códigos
+        List<Integer> list = Arrays.asList(1,2,3,4,5,6);
+        //ex.:
+        list.stream()
+                .forEach(System.out::println);//O method reference é essa maneira alternativa de escrever expressões Lambdas que diminui o código e, por conta disso, diminui as chances de erro.
+        
+        System.out.println("\n==================================\n");
+        
+        //Há 4 tipos de Method Reference:
+        //para métodos static
+        list.stream()
+                .map(EstudoStreams::multiplicaPorDois)//Para métodos static basta colocarmos o nome da classe, seguido de :: e por fim o nome do método.
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //para construtores
+        list.stream()
+                .map(BigDecimal::new)//Para construtores basta colocarmos o nome da classe, seguido de :: e por fim colocarmos new.
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //para múltiplas instâncias
+        list.stream()
+                .map(Integer::doubleValue)//Aqui se está usando um Method Reference em cada valor da stream que é instanciado como Integer, invocando o método doubleValue deles, por isso várias instâncias.
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //para instância única
+        BigDecimal dois = new BigDecimal(2);
+        list.stream()
+                .map(BigDecimal::new)
+                .map(dois::multiply)//Aqui se está usando um Method Reference apenas no obejeto dois instânciado como BigDecimal, invocando o método multiply dele, por isso instância única.
+                .forEach(System.out::println);
+        
+        //Method Reference só podem ser usados em métodos que recebem no máximo 1 parametro.
     }
     
     /*
@@ -396,4 +442,9 @@ public class EstudoStreams {
         }
     }
     */
+    
+    //Method Reference
+    public static Integer multiplicaPorDois(Integer n){
+        return n*2;
+    }
 }
