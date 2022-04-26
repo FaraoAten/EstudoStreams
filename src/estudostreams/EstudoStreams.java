@@ -153,6 +153,8 @@ public class EstudoStreams {
         //também é possível fazer com que o joining contate algo entre os elementos ao adicionar um delimitador (há também uma terceira assinatura mais detalhada).
         System.out.println("\n==================================\n");
          */
+        
+         /*
         //Optional
         //Classe inserida no Java 8 que tem por intuito facilitar o trabalho com valores que podem ser null.
         //Existem Optionals para os tipos primitivos.
@@ -202,8 +204,91 @@ public class EstudoStreams {
         System.out.println(numero7);
         Integer numero8 = converteEmNumero(s2).orElseThrow(() -> new NullPointerException("Valor vazio."));
         System.out.println(numero8);
+        */
+         
+         //Streams - Reduce
+         //A função do reduce é basicamente juntar todos os elementos de uma stream em um único valor.
+         
+         List<Integer> list = Arrays.asList(1,2,3,4,5,6);
+         
+         Optional<Integer> reduceSoma = list.stream()
+                 .reduce((n1, n2) -> n1 + n2);//Aqui está sendo usada a função de acumulação do reduce, reduce(Accumulator), através da soma de elementos, na expreção Lambda descrita se soma os 2 primeiros elemetos, então o resultado da soma passa a ser o n1 e o elemento seguinte o n2.
+         System.out.println(reduceSoma.get());
+         
+         System.out.println("\n==================================\n");
+         
+         Optional<Integer> reduceMult = list.stream()
+                 .reduce((n1, n2) -> n1 * n2);//Aqui está sendo feita a mesma coisa do anterior, porém com multiplicação. 
+         System.out.println(reduceMult.get());
+         
+         System.out.println("\n==================================\n");
+         
+         Optional<String> reduceStr = list.stream()
+                 .map(e -> String.valueOf(e))
+                 .reduce((s1, s2) -> s1.concat(s2));//Aqui está sendo feita a mesma coisa do anterior, porém com concatenação de textos.
+         System.out.println(reduceStr.get());
+         
+         //Subtração e divisão não podem ser utilizadas no reduce, pois as funções uzadas nele devem ser associativa, ou seja, se forem executadas captando os elementos de forma sequencial ou separando-os em grupos e depois juntando os resultados dos grupos o resultado final deve ser o mesmo.
+         
+         System.out.println("\n==================================\n");
+         
+         //Redudce usando valor de identidade, isso é usado para caso onde você não pode ou não quer receber nulo, ao ter um valor de identidade ao invés de receber um Optional você recebe um valor não nulo, como Integer por exemplo.
+         //O valor de identidade atual como um valor mínimo para a operção, é utilizado quando a stream está vazia e tem de seguir a seguinte regra: ao fazer a operação entre e um valor da stream o resultado deve ser esse valor da stream.
+         
+         List<Integer> listVazia = Arrays.asList();
+         
+         Integer reduceSoma2 = list.stream()
+                 .reduce(0, (n1, n2) -> n1 + n2);//O valor identidade da soma é 0, pois qualquer número somado a 0 é o próprio número.
+         System.out.println(reduceSoma2);
+         
+         Integer reduceSoma3 = listVazia.stream()
+                 .reduce(0, (n1, n2) -> n1 + n2);
+         System.out.println(reduceSoma3);
+         
+         System.out.println("\n==================================\n");
+         
+         Integer reduceMult2 = list.stream()
+                 .reduce(1, (n1, n2) -> n1 * n2);//O valor identidade da multiplicação é 1, pois qualquer número multiplicado por 1 é o próprio número.
+         System.out.println(reduceMult2);
+         
+         Integer reduceMult3 = listVazia.stream()
+                 .reduce(1, (n1, n2) -> n1 * n2);
+         System.out.println(reduceMult3);
+         
+         System.out.println("\n==================================\n");
+         
+         String reduceStr2 = list.stream()
+                 .map(e -> String.valueOf(e))
+                 .reduce("", (s1, s2) -> s1.concat(s2));//O valor identidade da concatenção é "", pois qualquer texto concatenado com "" é o próprio texto.
+         System.out.println(reduceStr2);
+         
+         String reduceStr3 = listVazia.stream()
+                 .map(e -> String.valueOf(e))
+                 .reduce("", (s1, s2) -> s1.concat(s2));
+         System.out.println(reduceStr3);
+         
+         System.out.println("\n==================================\n");
+         
+         //Reduce usando valor de identidade e função de combinação.
+         //Basicamente usado para quando temos streams paralelas, onde o reduce pode acabar separando a stream em vários grupos, nesses casos a função de acumulação é aplicada nos grupos e a de combinação é aplicada para juntar os grupos.
+         
+         Integer reduceSoma4 = list.stream()
+                 .reduce(0, (n1, n2) -> n1 + n2, (n1, n2) -> n1 + n2);//Na soma, e nas outras operações acima, as funções de acumulação e combinação são iguais, pois queremos a mesma coisa mesmo que o reduce quebre a stream em vários grupos.
+         System.out.println(reduceSoma4);
+         
+         Integer reduceSoma5 = listVazia.stream()
+                 .reduce(0, (n1, n2) -> n1 + n2, (n1, n2) -> n1 + n2);
+         System.out.println(reduceSoma5);
+         
+         System.out.println("\n==================================\n");
+         
+         String reduceStr4 = list.stream()
+                 .reduce("", (s1, s2) -> s1.toString().concat(s2.toString()), (s1, s2) -> s1.concat(s2));//Nesse caso a função de acumulação e combinação são diferentes, pois estamos praticamente aplicando uma map nos grupos enquando acumulamos, mas o map não é necessário na hora de combinar os grupos. Abre possibilidade para realizarmos operações de transformação usando reduce.
+         System.out.println(reduceStr4);
+         //Esse modelo de reduce existe especificamente para casos como esse, pois pode haver um ganho de performace, pois nos outros casos a função de acumulação e combinação são a mesma, então as opções anteriores de reduce já bastam.
     }
-
+    
+    /*
     //Optional
     public static Optional<Integer> converteEmNumero(String s) {
         try {
@@ -214,4 +299,5 @@ public class EstudoStreams {
             return Optional.empty();//O método empty() retorna um Optional vazio.
         }
     }
+    */
 }
