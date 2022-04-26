@@ -1,10 +1,15 @@
 package estudostreams;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class EstudoStreams {
@@ -137,6 +142,7 @@ public class EstudoStreams {
                 .collect(Collectors.groupingBy(e -> e % 3)); 
         System.out.println(mapa2);
         //aqui o mapa é de inteiros, pois o resultado da função é um inteiro.
+ 
         System.out.println("\n==================================\n");
         
         String joining = lista.stream()
@@ -206,6 +212,7 @@ public class EstudoStreams {
         System.out.println(numero8);
         */
          
+         /*
          //Streams - Reduce
          //A função do reduce é basicamente juntar todos os elementos de uma stream em um único valor.
          
@@ -286,6 +293,95 @@ public class EstudoStreams {
                  .reduce("", (s1, s2) -> s1.toString().concat(s2.toString()), (s1, s2) -> s1.concat(s2));//Nesse caso a função de acumulação e combinação são diferentes, pois estamos praticamente aplicando uma map nos grupos enquando acumulamos, mas o map não é necessário na hora de combinar os grupos. Abre possibilidade para realizarmos operações de transformação usando reduce.
          System.out.println(reduceStr4);
          //Esse modelo de reduce existe especificamente para casos como esse, pois pode haver um ganho de performace, pois nos outros casos a função de acumulação e combinação são a mesma, então as opções anteriores de reduce já bastam.
+         */
+         
+        //Streams - Collect
+        //Semelhante ao reduce, porém para trabalhar com objetos mutáveis.
+        
+        List<Integer> list = Arrays.asList(1,2,3,4,5,6);
+
+        List<Integer> collect = list.stream()
+                .collect(() -> new ArrayList<>(), (l,e) -> l.add(e), (l1,l2) -> l1.addAll(l2));
+        //Nessa maneira de usar collectors personalizados ao invés dos prontos, primeiro temos que informar um Supplier que é uma Lambda que retorna a instância de onde vamos armazenar os dados, segundamente informamos o método de acumulação e por fim o de combinação, esses 2 últimos funcionam como no reduce.
+        System.out.println(collect);
+        
+        System.out.println("\n==================================\n");
+        
+        Set<Integer> collect2 = list.stream()
+                .collect(() -> new HashSet(), (l,e) -> l.add(e), (l1,l2) -> l1.addAll(l2));
+        //Usando outra instância no Supplier.
+        System.out.println(collect2);
+        
+        //Essa versão mais crua do Collect normalmente não é utilizada, já que os collectors já prontos atendem muito bem as necessidades.
+        
+        System.out.println("\n==================================\n");
+        
+        //Collector prontos (Não estou anotando os que já foram vistos em aulas anteriores, toList; groupingBy e joining).
+        
+        Set<Integer> collectSet = list.stream()
+                .filter(e -> e % 2 == 0)
+                .collect(Collectors.toSet());//O método collect(Collectors.toSet()) agrupa e retorna o resultado das manipulações feitas na stream em um set.
+        System.out.println(collectSet);
+        
+        System.out.println("\n==================================\n");
+        
+        Set<Integer> collectCollection = list.stream()
+                .filter(e -> e % 2 == 0)
+                .collect(Collectors.toCollection(() -> new TreeSet<>()));//O método collect(Collectors.toCollection()) agrupa e retorna o resultado das manipulações feitas na stream em uma collection a sua escolha (outros exemplo são LinkedList, ArrayDeque etc...).
+        System.out.println(collectCollection);
+        
+        System.out.println("\n==================================\n");
+        
+        Double collectAvereging = list.stream()
+                .collect(Collectors.averagingInt(n -> n.intValue()));//O método collect(Collectors.averagingInt(mapper)) retorna a média de todos os valores dentro da stream, mapper é só para transformar o tipo do valor em um tipo primitivo e existem versões do avareging para double e float também.
+        System.out.println(collectAvereging);
+        
+        System.out.println("\n==================================\n");
+        
+        Integer collectSumming = list.stream()
+                .collect(Collectors.summingInt(n -> n.intValue()));//O método collect(Collectors.summingInt(mapper)) retorna a soma de todos os valores dentro da stream, mapper é só para transformar o tipo do valor em um tipo primitivo e existem versões do summing para double e float também.
+        System.out.println(collectSumming);
+        
+        System.out.println("\n==================================\n");
+        
+        IntSummaryStatistics collectSummarizing = list.stream()
+                .collect(Collectors.summarizingInt(n -> n.intValue()));//O método collect(Collectors.summarizingInt(mapper)) retorna uma série de resultados de operações envolvendo todos os valores dentro da stream, mapper é só para transformar o tipo do valor em um tipo primitivo e existem versões do summarizing para double e float também.
+        System.out.println(collectSummarizing.getAverage());
+        System.out.println(collectSummarizing.getCount());
+        System.out.println(collectSummarizing.getMax());
+        System.out.println(collectSummarizing.getMin());
+        System.out.println(collectSummarizing.getSum());
+        
+        System.out.println("\n==================================\n");
+         
+        Long collectCounting = list.stream()
+                .filter(e -> e % 2 == 0)
+                .collect(Collectors.counting());//O método collect(Collectors.counting()) retorna a quantia de elementos na stream em um Long.
+        System.out.println(collectCounting);
+        
+        System.out.println("\n==================================\n");
+         
+        list.stream()
+                .collect(Collectors.minBy(Comparator.naturalOrder()))//O método collect(Collectors.minBy(comparator)) compara através de um método compareTo presente na classe do elemento ou através de um comparator implemtentado aqui e retorna o menor elemento da stream em um Opcional<T>.
+                .ifPresent(e -> System.out.println(e));
+        
+        System.out.println("\n==================================\n");
+         
+        list.stream()
+                .collect(Collectors.maxBy(Comparator.naturalOrder()))//O método collect(Collectors.maxBy(comparator)) compara através de um método compareTo presente na classe do elemento ou através de um comparator implemtentado aqui e retorna o maior elemento da stream em um Opcional<T>.
+                .ifPresent(e -> System.out.println(e));
+        
+        System.out.println("\n==================================\n");
+         
+        Map<Boolean, List<Integer>> collectPartitioningBy = list.stream()
+                .collect(Collectors.partitioningBy(e -> e % 3 == 0));//O método collect(Collectors.partitioningBy(Predicate)) agrupa e retorna o resultado das manipulações feitas na stream em um map obrigatóriamente booleano com a organização dele sendo definida pela função passada no partitioningBy.
+        System.out.println(collectPartitioningBy);
+        
+        System.out.println("\n==================================\n");
+         
+        Map<Integer, Double> collectToMap = list.stream()
+                .collect(Collectors.toMap(e -> e, e -> Math.pow(e.doubleValue(), 5)));//O método collect(Collectors.toMap(Function, Function)) agrupa e retorna o resultado das manipulações feitas na stream em um map com a chave sendo definida pela primeira função e o valor pela segunda, há mais assituras de toMap essa é a mais simples, mas o toMap é só uma opção mais personalizavel para retorna um map de uma stream.
+        System.out.println(collectToMap);
     }
     
     /*
