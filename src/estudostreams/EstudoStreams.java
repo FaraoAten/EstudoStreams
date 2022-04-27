@@ -9,9 +9,11 @@ import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EstudoStreams {
 
@@ -389,6 +391,7 @@ public class EstudoStreams {
         System.out.println(collectToMap);
         */
         
+        /*
         //Method Reference
         //Uma maneira de encurtar códigos
         List<Integer> list = Arrays.asList(1,2,3,4,5,6);
@@ -428,6 +431,62 @@ public class EstudoStreams {
                 .forEach(System.out::println);
         
         //Method Reference só podem ser usados em métodos que recebem no máximo 1 parametro.
+        */
+        
+        //Streams - Interfaces Funcionais
+        //As interfaces funcionais são as interfaces no padrão SAM, aqui vamos ver e enteder sobre as que já vem prontas no Java e são usadas nos métodos de stream.
+        
+        //Supplier (Fornecedor)
+        //Não recebe nenhum parametro e retorna um valor T. Ele basicamente gera valores.
+        //Quando um método pede um Supplier é porque ele não quer receber nenhum parametro, apenas quer receber o valor que será gerado pelo Supplier para fazer algo.
+        Stream.generate(() -> new Random().nextInt())//O generate recebe um Supplier que gera os elementos para ele criar uma Stream sequêncial não-ordenada.
+                .limit(5)
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //Consumer (Consumidor)
+        //Basicamente o oposto do Supplier, ele recebe um parametro, faz algo com ele, e não retorna nada.
+        //Quando um método pede um Consumer é porque ele quer receber um parametro e realizar alguma ação com ele e não retornar nada.
+        Stream.generate(() -> new Random().nextInt())
+                .limit(2)
+                .forEach((e) -> System.out.println(e));//O forEach recebe um Consumer onde ele recebe um parametro para realizar uma ação, como printar por exemplo, e não retorna nada.
+        
+        //Existe também o Biconsumer (Biconsumidor) que é um Consumer que recebe 2 parametros e atua da mesma maneira.
+        
+        System.out.println("\n==================================\n");
+        
+        List<Integer> list = Arrays.asList(1,2,3,4,5,6);
+        
+        //Predicate (Predicado)
+        //Ele recebe um parametro e retorna um boolean.
+        //Quando um método pede um Predicate é porque ele quer receber um parametro e retornar o resultado de uma comparação (True ou False).        
+        list.stream()
+                .filter(e -> e % 2 ==0)//O filter recebe um Predicate onde ele recebe um um parametro e faz uma comparação com ele para gerar um nova stream apenas com os valores que passaram na comparação.
+                .forEach(System.out::println); 
+        
+        //Existe também o Bipredicate (Bipredicado) que é um Predicate que recebe 2 parametros e atua da mesma maneira.
+        
+        System.out.println("\n==================================\n");
+        
+        //Function (Função) (A mais genérica das Interfaces Funcionais)
+        //Ela recebe um parametro e retorna um valor T.
+        //Quando um método pede uma Function é porque ele quer receber um parametro e retornar um valor T como resultado de uma operação feita.
+        list.stream()
+                .map(e -> e * 2)//O map recebe uma Function onde ela recebe um parametro e faz uma modificação determinada na expressão lambda para gerar um nova stream apenas com os valores modificados.
+                .forEach(System.out::println);
+        
+        //Existe também a Bifunction (Bifunção) que é uma Function que recebe 2 parametros e atua da mesma maneira.
+        
+        System.out.println("\n==================================\n");
+        
+        //UnaryOperator (Operador Unitário)
+        //Ela recebe um parametro do tipo T e retorna um valor também do tipo T. Ele extende Function, logo atua como ela, tendo como única difereça que a entrada e saída sejam do mesmo tipo.
+        //Quando um método pede um UnaryOperator é porque ele quer receber um parametro de um tipo e retornar um valor do mesmo tipo como resultado de uma operação feita.
+        //Existe também o BinaryOperator (Operador Binário) que extende Bifunction recebendo 2 parametros de um único tipo e retornando um valor do mesmo tipo, assim atuando de maneira semelhante ao UnaryOperator.
+        list.stream()
+                .reduce((n1, n2) -> n1+n2)//O reduce recebe um BinaryOperator onde ele recebe 2 parametros e faz, nesse exemplo, um acumulação determinada na função lambda para gerar um Optional<T> com o resultado final da acumulação.
+                .ifPresent(System.out::println);
     }
     
     /*
@@ -443,8 +502,10 @@ public class EstudoStreams {
     }
     */
     
+    /*
     //Method Reference
     public static Integer multiplicaPorDois(Integer n){
         return n*2;
     }
+    */
 }
