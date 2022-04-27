@@ -494,6 +494,8 @@ public class EstudoStreams {
                 .reduce((n1, n2) -> n1+n2)//O reduce recebe um BinaryOperator onde ele recebe 2 parametros e faz, nesse exemplo, um acumulação determinada na função lambda para gerar um Optional<T> com o resultado final da acumulação.
                 .ifPresent(System.out::println);
          */
+ 
+         /*
         //Streams - Todas as maneiras de se gerar streams.
         //Collection - pode se gerar uma stream de qualquer coleção de dados, por exemplo, List e suas filhas, Set etc...
         List<Integer> list = Arrays.asList(1, 2, 3, 4);
@@ -557,7 +559,72 @@ public class EstudoStreams {
         Pattern pattern = Pattern.compile("\\s");
         pattern.splitAsStream("Oi,Meu nome é Aten.")
                 .forEach(System.out::println);
-        
+        */
+         
+         //Streams paralelas
+         
+         List<Integer> list = Arrays.asList(1,2,3,4);
+         
+         /*
+         //parallel vs parallelStream
+         //O meio para para criar uma stream paralela varia dependendo do jeito que você cria a Stream:
+         list.parallelStream();//Basicamente se for uma collection basta substituir o método stream por parallelStream().
+         
+         IntStream.range(0, 5).parallel();//Em qualquer outro caso se adiciona o método parallel após a criação da stream.
+         */
+         
+         //Usar streams paralelas de maneira pontual apenas quando for necessário, questão de trabalhar com milhares de registros, pois só assim ganho vai ser maior que o custo de processamento e vai haver um real ganho de performance.
+         
+         //forEach vs forEachOrdered
+         list.parallelStream()
+                 .forEach(System.out::println);//Quando se trabalha com streams paralelas, pelo sistema de processamento usado por elas, o forEach passa os elementos de maneira aleatória.
+         
+         System.out.println("\n==================================\n");
+         
+         list.parallelStream()
+                 .forEachOrdered(System.out::println);//Para preservar a ordem original da stream devesse usar o forEachOrdered, caso seja necessário preservá-la.
+         
+         System.out.println("\n==================================\n");
+         
+         //findAny
+         
+         list.stream()
+                 .findAny()//Em uma stream comum onde o tratamento é sequêncial o findAny retorna um Optional vazio ou com o primeiro elemento da stream.
+                 .ifPresent(System.out::println);
+         
+         System.out.println("\n==================================\n");
+         
+         list.parallelStream()
+                 .findAny()//Mas em uma stream paralela onde é feito um tratamento múltiplo o findAny retona um Optional vazio ou com o elemento presente no primeiro tratramento resolvido pelo sistema.
+                 .ifPresent(System.out::println);
+         
+         System.out.println("\n==================================\n");
+         
+         //unordered
+         //Método criado para se usar junto de skip, limit e distinct que exigem certa sincronia entre as threads que deviriam ser independêntes, então, caso no seu código não importe qual elemento será pulado pelo skip, quais serão tratados dentro do limit ou qual será pego pelo distinct, use unordered para utilizar nesse método a ordem em que os elementos ficam prontos nas threads, assim ganhando performance.
+         list.parallelStream()
+                 .unordered()
+                 .skip(1)
+                 .limit(2)
+                 .forEach(System.out::println);
+         
+         System.out.println("\n==================================\n");
+         
+         //toConcurrentMap
+         //Quando se usa parallel streams, para ganhar performance, ao invés criar um mapa usando toMap usa-se o toConcurrentMap, pois ele permite que todas as threads acessem ele ao mesmo tempo para inserir seus valores, não forçando o programa a criar diversos mapa e dar um merge em todos eles.
+         Map<Integer, Boolean> mapa = list.parallelStream()
+                 .collect(Collectors.toConcurrentMap(n -> n, n -> n%2 == 0));
+         System.out.println(mapa);
+         
+         System.out.println("\n==================================\n");
+         
+         //groupingByConcurrent
+         //Mesma ideia do toConcurrentMap, porém aplicado ao grouppingBy.
+         Map<Boolean, List<Integer>> mapaGBC = list.parallelStream()
+                 .collect(Collectors.groupingByConcurrent(n -> n%2 == 0));
+         System.out.println(mapaGBC);
+         
+         //Nas versões Concurrent você pode perder a ordem dos elementos.
     }
 
     /*
