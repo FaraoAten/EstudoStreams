@@ -1,6 +1,14 @@
 package estudostreams;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,12 +20,14 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class EstudoStreams {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException {
         /*
        //Funções Lambda
        //Funções Lambda são um jeito mais simples de implementar métodos de interfaces SAM (Single Abstract Method)
@@ -165,8 +175,7 @@ public class EstudoStreams {
         //também é possível fazer com que o joining contate algo entre os elementos ao adicionar um delimitador (há também uma terceira assinatura mais detalhada).
         System.out.println("\n==================================\n");
          */
-        
-         /*
+ /*
         //Optional
         //Classe inserida no Java 8 que tem por intuito facilitar o trabalho com valores que podem ser null.
         //Existem Optionals para os tipos primitivos.
@@ -216,9 +225,8 @@ public class EstudoStreams {
         System.out.println(numero7);
         Integer numero8 = converteEmNumero(s2).orElseThrow(() -> new NullPointerException("Valor vazio."));
         System.out.println(numero8);
-        */
-         
-         /*
+         */
+ /*
          //Streams - Reduce
          //A função do reduce é basicamente juntar todos os elementos de uma stream em um único valor.
          
@@ -300,8 +308,7 @@ public class EstudoStreams {
          System.out.println(reduceStr4);
          //Esse modelo de reduce existe especificamente para casos como esse, pois pode haver um ganho de performace, pois nos outros casos a função de acumulação e combinação são a mesma, então as opções anteriores de reduce já bastam.
          */
-         
-        /*
+ /*
         //Streams - Collect
         //Semelhante ao reduce, porém para trabalhar com objetos mutáveis.
         
@@ -389,9 +396,8 @@ public class EstudoStreams {
         Map<Integer, Double> collectToMap = list.stream()
                 .collect(Collectors.toMap(e -> e, e -> Math.pow(e.doubleValue(), 5)));//O método collect(Collectors.toMap(Function, Function)) agrupa e retorna o resultado das manipulações feitas na stream em um map com a chave sendo definida pela primeira função e o valor pela segunda, há mais assituras de toMap essa é a mais simples, mas o toMap é só uma opção mais personalizavel para retorna um map de uma stream.
         System.out.println(collectToMap);
-        */
-        
-        /*
+         */
+ /*
         //Method Reference
         //Uma maneira de encurtar códigos
         List<Integer> list = Arrays.asList(1,2,3,4,5,6);
@@ -431,8 +437,8 @@ public class EstudoStreams {
                 .forEach(System.out::println);
         
         //Method Reference só podem ser usados em métodos que recebem no máximo 1 parametro.
-        */
-        
+         */
+ /*
         //Streams - Interfaces Funcionais
         //As interfaces funcionais são as interfaces no padrão SAM, aqui vamos ver e enteder sobre as que já vem prontas no Java e são usadas nos métodos de stream.
         
@@ -487,8 +493,73 @@ public class EstudoStreams {
         list.stream()
                 .reduce((n1, n2) -> n1+n2)//O reduce recebe um BinaryOperator onde ele recebe 2 parametros e faz, nesse exemplo, um acumulação determinada na função lambda para gerar um Optional<T> com o resultado final da acumulação.
                 .ifPresent(System.out::println);
+         */
+        //Streams - Todas as maneiras de se gerar streams.
+        //Collection - pode se gerar uma stream de qualquer coleção de dados, por exemplo, List e suas filhas, Set etc...
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+        list.stream()
+                .forEach(System.out::println);
+
+        System.out.println("\n==================================\n");
+
+        //Arrays - através da classe Arrays é possível criar stream de arrays comuns também
+        Integer[] intArray = new Integer[]{1, 2, 3, 4};
+        Arrays.stream(intArray)
+                .forEach(System.out::println);
+
+        System.out.println("\n==================================\n");
+
+        //Stream.of - com o método of da classe Stream é possível criar uma stream de qualquer sequência de valores que você inserir dentro do of.
+        Stream.of("A", "t", "e", "n")
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //IntStream.range - com o método range(inicial, final) da classe IntStream (também exite a DoubleStream, LongStream e FloatStream) é possível criar uma stream de um range de números que vai do inicial ao anterior do final (existe também o método rangeClosed que inclui o número final).
+        IntStream.range(0, 5)
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //Stream.interate - com o método interate(seed, f) da classe Stream é possível criar uma stream infinita onde é dado o ponto inicial e uma expreção lambda (UnaryOperator) que diz como gerar o próximo elemento (Também há uma versão mais customizável dele).
+        Stream.iterate(1, n -> n*2)
+                .limit(5)
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //BufferedReader - o método lines() gera uma stream de Strings presentes em linhas de um arquivo.
+        //Streams.txt - 11, 12, 13 (cada um em uma linha)
+        File file = new File("/C://Users//boder//Downloads//Streams.txt/");
+        FileReader in = new FileReader(file);
+        try (BufferedReader bufferedReader = new BufferedReader(in)) {
+            bufferedReader.lines()
+                    .forEach(System.out::println);
+        }
+        
+        System.out.println("\n==================================\n");
+        
+        //Files - o método list(Path) gera uma stream com todos os arquivos presentes naquele path.
+        Path p = Paths.get("");
+        Files.list(p)
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //Random - atráves dos métodos ints, doubles ou longs é possível criar streams númericas que são infinitas e aleatórias (também há versões desses métodos com mais parametros). 
+        new Random().ints()
+                .limit(3)
+                .forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //Pattern - através do método splitAsStream é possível gerar uma stream de Strings ao separar uma String em partes tomando como ponto de separação uma Regex.
+        Pattern pattern = Pattern.compile("\\s");
+        pattern.splitAsStream("Oi,Meu nome é Aten.")
+                .forEach(System.out::println);
+        
     }
-    
+
     /*
     //Optional
     public static Optional<Integer> converteEmNumero(String s) {
@@ -500,12 +571,11 @@ public class EstudoStreams {
             return Optional.empty();//O método empty() retorna um Optional vazio.
         }
     }
-    */
-    
-    /*
+     */
+ /*
     //Method Reference
     public static Integer multiplicaPorDois(Integer n){
         return n*2;
     }
-    */
+     */
 }
