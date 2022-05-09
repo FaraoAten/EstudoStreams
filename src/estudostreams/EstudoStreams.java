@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -561,17 +562,18 @@ public class EstudoStreams {
                 .forEach(System.out::println);
         */
          
+        /*
          //Streams paralelas
          
          List<Integer> list = Arrays.asList(1,2,3,4);
          
-         /*
+         
          //parallel vs parallelStream
          //O meio para para criar uma stream paralela varia dependendo do jeito que você cria a Stream:
          list.parallelStream();//Basicamente se for uma collection basta substituir o método stream por parallelStream().
          
          IntStream.range(0, 5).parallel();//Em qualquer outro caso se adiciona o método parallel após a criação da stream.
-         */
+         
          
          //Usar streams paralelas de maneira pontual apenas quando for necessário, questão de trabalhar com milhares de registros, pois só assim ganho vai ser maior que o custo de processamento e vai haver um real ganho de performance.
          
@@ -625,6 +627,66 @@ public class EstudoStreams {
          System.out.println(mapaGBC);
          
          //Nas versões Concurrent você pode perder a ordem dos elementos.
+         */
+        
+        //Manipulando Collection com Lambda
+        //Meio com menos código para manipular as collections
+        List<Integer> lista = new ArrayList<>();
+        lista.add(1);
+        lista.add(2);
+        lista.add(3);
+        lista.add(4);
+        lista.forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //removeIf
+        //O removeIf recebe um Predicate e remove os que passarem no teste retornando true.
+        lista.removeIf(n -> n%2==0);
+        lista.forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        //replaceAll - Exclusivo de listas
+        //O replaceAll recebe um UnaryOperator e substituí todos os valores da lista por outros ao aplicar a função Lambda à todos os valores.
+        lista.replaceAll(n -> n*2);//Aqui substituiu os valores originais da lista pelo seu dobro, por exemplo.
+        lista.forEach(System.out::println);
+        
+        System.out.println("\n==================================\n");
+        
+        HashMap<Integer,String> mapa = new HashMap<>();
+        mapa.put(0, "Aten");
+        mapa.put(1, "Fernandes");
+        mapa.put(2, "da");
+        mapa.put(3, "Silva");
+        
+        //forEach (para mapas)
+        //Para os mapas, o forEach recebe um BiConsumer, pois recebe tanto a chave quanto o valor.
+        mapa.forEach((n,e) -> System.out.println(n+" = "+e));
+        
+        System.out.println("\n==================================\n");
+        
+        //compute
+        //Irá fazer uma alteração em um elemento específico do mapa, identificado pela chave, porém se a chave não existir no mapa o método simplesmente a adiciona, devido a isso existe o método computeIfPresent.
+        //Também existe o computeIfAbsent, mas não entendi ele muito bem.
+        mapa.compute(3, (n, e) -> e+"!");
+        mapa.forEach((n,e) -> System.out.println(n+" = "+e));
+        
+        System.out.println("\n==================================\n");
+        
+        //merge
+        //Funciona de maneira similar ao compute porém ele recebe a chave, um valor e uma função lambda recebendo como parametro o valor relacionado a chave e o valor passado no merge, então exencuta a alterção descrita na função lambda.
+        //Caso a  chave não exista no mapa ele a cria e se o valor passado no merge é inserido no mapa através da expressão lambda o método associa apenas esse valor passado à chave.
+        mapa.merge(3, "!", (v1, v2) -> v1+v2);
+        mapa.merge(4, "(ö x ö)", (v1, v2) -> v1+v2);//chave não existente. diferente do compute ele não coloca um null como valor associado à chave.
+        mapa.forEach((n,e) -> System.out.println(n+" = "+e));
+        
+        System.out.println("\n==================================\n");
+        
+        //replaceAll (para mapas)
+        //Assim como o forEach ele deve receber a chave e o seu valor relacionado para excutar a função lambda em todos os elementos.
+        mapa.replaceAll((n, e) -> e.toUpperCase());
+        mapa.forEach((n,e) -> System.out.println(n+" = "+e));
     }
 
     /*
